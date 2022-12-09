@@ -1,24 +1,33 @@
+// Corrida de Cavalos - LP2 (dezembro de 2022)
+// Christopher Alec, Mayra Daher, Victoria Grisi, Yan Feitosa e Samantha Medeiros
+
 import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.BrokenBarrierException;
 
-/**
- * Created by Sean Gerhardt on 5/26/2015.
- */
 public class Main {
-
+  /* 
   static void cadastrarAposta() {
-    // Jogador j1 = new Jogador(1, "João", 25.00f, 7, false);
+    Scanner inputHandle = new Scanner(System.in);
+
     System.out.println("---- Cadastrar aposta ----");
-    System.out.println("Nome do jogador: ");
-    System.out.println("Valor da aposta: ");
-    System.out.println("Número do cavalo apostado: ");
-
-    // cria objeto do tipo jogador e faz a conexão?
-  }
-
+  
+    // Cria uma lista com cada jogador adicionado
+    ArrayList<Gambler> GamblersList = new ArrayList<Gambler>();
+    GamblersList.add(new Gambler(nomeApostador, valorAposta, carteiraApostador, idCavalo));
+    inputHandle.close(); // fecha o auxiliar de input
+  }*/
+  // public static Horse[] main(String args[], Object Horse) throws InterruptedException, BrokenBarrierException {
+  
   public static void main(String args[]) throws InterruptedException, BrokenBarrierException {
+
+    // Recupera os cavalos criados na classe Cavalo dentro do método getHorseList()
+    Horse h = new Horse();
+    List<Horse> horses = h.getHorseList();
+
     // MENU
     int contagem_jogadores = 0;
     while (true) {
@@ -50,71 +59,68 @@ public class Main {
       } else {
         switch (opcao) {
           case 1:
-            System.out.println("Iniciar corrida");
+            // Criar nova pista, 
+            // informar a dimensão
+            // informar número máximo de cavalos (qtd_raias)
+            RaceTrack pista = new RaceTrack(100, 7);
 
-            // válida se há alguma aposta
-            if (contagem_jogadores > 2) {
-              System.out.println("A corrida vai iniciar!");
-              // inicia a corrida
-              // Delay, in milliseconds before we interrupt MessageLoop thread (default one
-              // hour).
-              long patience = 1000 * 60 * 60;
+            System.out.println("A corrida vai iniciar!");
+            // inicia a corrida
+            // Delay, in milliseconds before we interrupt MessageLoop thread (default one
+            // hour).
+            long patience = 1000 * 60 * 60;
 
-              // If command line argument present, gives patience in seconds.
-              if (args.length > 0) {
-                try {
-                  patience = Long.parseLong(args[0]) * 1000;
-                } catch (NumberFormatException e) {
-                  System.err.println("Argument must be an integer.");
-                  System.exit(1);
-                }
+            // If command line argument present, gives patience in seconds.
+            if (args.length > 0) {
+              try {
+                patience = Long.parseLong(args[0]) * 1000;
+              } catch (NumberFormatException e) {
+                System.err.println("Argument must be an integer.");
+                System.exit(1);
               }
-
-              Horse.threadMessage("Starting MessageLoop thread");
-              long startTime = System.currentTimeMillis();
-
-              Horse[] horses = new Horse[] {
-                  new Horse(1, "Pé de Pano"),
-                  new Horse(2, "Bala no Alvo"),
-                  new Horse(3, "Ponyta"),
-                  new Horse(4, "Ventania"),
-                  new Horse(5, "Spirit"),
-                  new Horse(6, "Epona"),
-                  new Horse(7, "Sortudo"),
-              };
-
-              Thread[] threads = new Thread[horses.length];
-
-              Horse.gate = new CyclicBarrier(horses.length + 1);
-
-              for (int i = 0; i < horses.length; i++) {
-                threads[i] = new Thread(horses[i]);
-                threads[i].start();
-              }
-
-              Horse.gate.await(); // The count on the gate is now met, open the gate and start the race!
-              Horse.threadMessage("Waiting for Horse threads to finish");
-
-              for (int i = 0; i < horses.length; i++) {
-                while (threads[i].isAlive()) {
-                  threads[i].join(1000); // Wait a maximum of 1 second for the thread to finish.
-                  if (((System.currentTimeMillis() - startTime) > patience) && threads[i].isAlive()) {
-                    Horse.threadMessage("Tired of waiting!");
-                    threads[i].interrupt();
-                    threads[i].join(); // The join method allows one thread to wait for the completion of another.
-                  }
-                }
-              }
-              Horse.threadMessage("Fim da corrida!");
-            } else {
-              System.out.println("A corrida iniciará quando houver mais de 2 apostas.");
-              System.out.println("O número atual de apostas é: " + contagem_jogadores + ".");
             }
 
-            break;
+            Horse.threadMessage("Starting MessageLoop thread");
+            long startTime = System.currentTimeMillis();
+
+            /*Horse[] horses = new Horse[] {
+              new Horse(1, "Pé de Pano"),
+              new Horse(2, "Bala no Alvo"),
+              new Horse(3, "Ponyta"),
+              new Horse(4, "Ventania"),
+              new Horse(5, "Spirit"),
+              new Horse(6, "Epona"),
+              new Horse(7, "Sortudo"),
+            };*/
+
+            Thread[] threads = new Thread[horses.size()];
+
+            Horse.gate = new CyclicBarrier(horses.size() + 1);
+
+            for (int i = 0; i < horses.size(); i++) {
+              threads[i] = new Thread(horses.get(i));
+              threads[i].start();
+            }
+
+            Horse.gate.await(); // The count on the gate is now met, open the gate and start the race!
+            Horse.threadMessage("Waiting for Horse threads to finish");
+
+            for (int i = 0; i < horses.size(); i++) {
+              while (threads[i].isAlive()) {
+                threads[i].join(1000); // Wait a maximum of 1 second for the thread to finish.
+                if (((System.currentTimeMillis() - startTime) > patience) && threads[i].isAlive()) {
+                  Horse.threadMessage("Tired of waiting!");
+                  threads[i].interrupt();
+                  threads[i].join(); // The join method allows one thread to wait for the completion of another.
+                }
+              }
+            }
+            Horse.threadMessage("Fim da corrida!");
+
+          break;
           case 2:
             System.out.println("Cadastrar aposta.");
-            cadastrarAposta();
+            //cadastrarAposta();
             contagem_jogadores += 1; // incremento
             break;
           case 3:
