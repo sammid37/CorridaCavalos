@@ -7,7 +7,7 @@ public class RaceTrack {
 	public void setRaceTrackSize(int size) { this.size = size; }
 	
 	// Recebe a quantidade de cavalos que estão correndo, é interessante recuperar utilizando horselist.size()
-	public int getRaceTrackHorses() { return horses; }
+	public int getRaceTrackHorses() { return horses; } 
 	public void setRaceTrackHorses(int horses) { this.horses = horses; }
 	
 	//construtor
