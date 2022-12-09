@@ -1,49 +1,44 @@
-package horses_bet;
-
-import org.jetbrains.annotations.NotNull;
-
 public class BookMaker {
     private int bets_num = 0;
     private float total_value = 0;
     private float prize;
     private float bookmaker_profit;
-    
-    
+
+    // Get e set da quantidade de apostas
     public int getBets_num() {
         return bets_num;
     }
-
     private void setBets_num(int bets_num) {
         this.bets_num = bets_num;
     }
 
+    // Get e set do valor da aposta
     public float getTotal_value() {
         return total_value;
     }
-
     private void setTotal_value(float total_value) {
         this.total_value = total_value;
     }
 
+    // Get e set do lucro possivel lucro dos apostadores
     public float getPrize() {
 
         return prize;
     }
-
     private void setPrize(float prize) {
         this.prize = prize;
     }
 
+    // Get e set do lucro da casa de aposta
     public float getBookmaker_profit() {
 
         return bookmaker_profit;
     }
-
     private void setBookmaker_profit(float bookmaker_profit) {
         this.bookmaker_profit = bookmaker_profit;
     }
     //-------------------------------------------------------------------------------------------
-    public void bet(@NotNull Gambler gambler, @NotNull Horse horse, int value) {
+    public void bet(Gambler gambler, Horse horse, int value) {
         if (gambler.getWallet() >= value){
             gambler.setBet(value);
             gambler.setHorse(horse);
@@ -63,7 +58,7 @@ public class BookMaker {
         }
     }
 
-    public  void result(@NotNull Gambler gambler){
+    public  void result(Gambler gambler){
         if(gambler.getBet() != 0){
             if(this.getBets_num() >= 2) {
                 if(gambler.isWinner()) {
@@ -85,14 +80,14 @@ public class BookMaker {
 
     }
 
-    public void clear(@NotNull Gambler gambler){
+    public void clear(Gambler gambler){
         gambler.setReward(0);
         gambler.setBet(0);
         gambler.setHorse(null);
         gambler.setWinner(false);
     }
 
-    public void clear(@NotNull Horse horse){
+    public void clear(Horse horse){
          horse.setTotal_bet_value(0);
          horse.setBets_num(0);
     }
