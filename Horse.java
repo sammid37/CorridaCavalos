@@ -1,81 +1,89 @@
-import java.util.Scanner;
+import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
-public class Gambler {
+public class Horse implements Runnable {
+  private int id;
   private String name;
-  private float wallet; // saldo
-  private float bet;
-  private float reward;
-  private Boolean winner;
-  private Horse horse; // cavalo da aposta
+  private int distanceTravelled = 0;
+  private static int place = 1; // contador para identificar a colocação do cavalo
+  private int bets_num;
+  private float total_bet_value;
 
-  // Get e set do nome do apostador
-  public String getName() {
+  static CyclicBarrier gate = null; // Permite que as threads iniciem "juntas" com o mesmo tempo possível
+
+  public float getTotal_bet_value() {
+    return total_bet_value;
+  }
+  
+  public void setTotal_bet_value(float total_bet) {
+    this.total_bet_value = total_bet;
+  }
+
+  public int getBets_num() {
+    return bets_num;
+  }
+  public void setBets_num(int bets_num) {
+    this.bets_num = bets_num;
+  }
+
+  
+  public String getHorseName() {
     return name;
   }
 
-  private void setName(String name) {
+  public void setHorseName(String name) {
     this.name = name;
   }
 
-  // Get e set da carteira(saldo) do apostador
-  public float getWallet() {
-    return wallet;
+  public int getHorseId() {
+    return id;
   }
 
-  protected void setWallet(float wallet) {
-    this.wallet = wallet;
+  private void setHorseId(int id) {
+    this.id = id;
   }
 
-  // Get e set do valor da aposta do apostador
-  public float getBet() {
-    return bet;
+  Horse(int idHorse, String nameHorse) {
+    setHorseId(idHorse);
+    setHorseName(nameHorse);
   }
 
-  protected void setBet(float bet) {
-    this.bet = bet;
+  static void threadMessage(String message) {
+    String threadName = Thread.currentThread().getName();
+    System.out.format("%s: %s%n",
+        threadName,
+        message);
   }
 
-  // Get e set do recompensa do apostador
-  public float getReward() {
-    return reward;
+  public void run() {
+    try {
+      gate.await();
+
+      while (distanceTravelled < 100) {
+        Thread.sleep(4000);
+        distanceTravelled += this.gallop();
+
+        if (distanceTravelled < 100) {
+          threadMessage("🐎" + name + " percorreu " + distanceTravelled + " m.");
+        } else {
+          threadMessage("🏆" + name + " cruzou a linha de chegada em " + place + "º lugar");
+          place++;
+        }
+      }
+    } catch (InterruptedException e) {
+      threadMessage("I wasn't done!");
+    } catch (BrokenBarrierException e) {
+      e.printStackTrace();
+    }
   }
 
-  protected void setReward(float reward) {
-    this.reward = reward;
-  }
+  // Método para simular a alteração de velocidade dos cavalos
+  private int gallop() {
+    Random rand = new Random();
+    int maxSpeed = 20;
+    int minSpeed = 5;
 
-  // Get e set estado do jogador
-  public Boolean isWinner() {
-    return winner;
-  }
-
-  protected void setWinner(Boolean winner) {
-    this.winner = winner;
-  }
-
-  // Get e set do cavalo do apostador
-  public Horse getHorse() {
-    return horse;
-  }
-
-  private void setHorse(Horse horse) {
-    this.horse = horse;
-  }
-
-  // Construtor
-  public Gambler(Horse horse) {
-    Scanner sc = new Scanner(System.in);
-    // Informando atributos do apostador
-    System.out.print("Nome do jogador: ");
-    setName(sc.nextLine());
-
-    System.out.print("Saldo: ");
-    setWallet(sc.nextFloat());
-
-    System.out.print("Valor da aposta: ");
-    setBet(sc.nextFloat());
-
-    setHorse(horse);
-    System.out.println("\nOlá, " + getName() + "! Você apostou R$" + getBet() + " no cavalo " + horse.getHorseName() + ".");
+    return rand.nextInt(maxSpeed - minSpeed) + minSpeed;
   }
 }
