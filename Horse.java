@@ -1,6 +1,4 @@
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 public class Horse implements Runnable {
   private int id;
@@ -10,8 +8,6 @@ public class Horse implements Runnable {
   private int bets_num;
   private float total_bet_value;
   private Server server;
-
-  static CyclicBarrier gate = null; // Permite que as threads iniciem "juntas" com o mesmo tempo possível
 
   public float getTotal_bet_value() {
     return total_bet_value;
@@ -24,11 +20,11 @@ public class Horse implements Runnable {
   public int getBets_num() {
     return bets_num;
   }
+  
   public void setBets_num(int bets_num) {
     this.bets_num = bets_num;
   }
 
-  
   public String getHorseName() {
     return name;
   }
@@ -58,29 +54,24 @@ public class Horse implements Runnable {
         threadName,
         message);
     server.writer.format(format, threadName, message);
-    
   }
 
   public void run() {
     try {
-      gate.await();
-
       while (distanceTravelled < 100) {
         Thread.sleep(4000);
         distanceTravelled += this.gallop();
 
         if (distanceTravelled < 100) {
-          threadMessage("🐎" + name + " percorreu " + distanceTravelled + " m.", server);
+          threadMessage(name + " percorreu " + distanceTravelled + " m.", server);
         } else {
-          threadMessage("🏆" + name + " cruzou a linha de chegada em " + place + "º lugar", server);
+          threadMessage(name + " cruzou a linha de chegada em " + place + "º lugar", server);
           place++;
         }
       }
     } catch (InterruptedException e) {
-      threadMessage("I wasn't done!", server);
-    } catch (BrokenBarrierException e) {
-      e.printStackTrace();
-    }
+      threadMessage("Interrompido", server);
+    } 
   }
 
   // Método para simular a alteração de velocidade dos cavalos
