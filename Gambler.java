@@ -1,3 +1,5 @@
+import java.net.*;
+import java.io.*;
 import java.util.Scanner;
 
 public class Gambler {
@@ -7,6 +9,8 @@ public class Gambler {
   private float reward;
   private Boolean winner;
   private Horse horse; // cavalo da aposta
+
+  private Client client;
 
   // Get e set do nome do apostador
   public String getName() {
@@ -77,5 +81,32 @@ public class Gambler {
 
     setHorse(horse);
     System.out.println("\nOlá, " + getName() + "! Você apostou R$" + getBet() + " no cavalo " + horse.getHorseName() + ".");
+  }
+
+  // Conexão Client-Server
+  
+  //Método para conectar-se ao servidor
+  public void connectToServer(){
+    client = new Client();
+  }
+
+  //Classe Client
+  private class Client {
+    private Socket socket;
+    private BufferedReader reader;
+    private PrintWriter writer;
+
+    public Client() {
+      System.out.println("----- Conexão de Cliente -----");
+      try {
+        socket = new Socket("localhost", 9090);
+
+        writer = new PrintWriter(socket.getOutputStream(), true);
+        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
   }
 }
