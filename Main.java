@@ -9,7 +9,6 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.BrokenBarrierException;
 
 public class Main {
-
   public static void main(String args[]) throws InterruptedException, BrokenBarrierException {
     Scanner sc = new Scanner(System.in);
 

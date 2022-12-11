@@ -1,5 +1,3 @@
-import java.net.*;
-import java.io.*;
 import java.util.Scanner;
 
 public class Gambler {
@@ -9,8 +7,6 @@ public class Gambler {
   private float reward;
   private Boolean winner;
   private Horse horse; // cavalo da aposta
-
-  private Client client;
 
   // Get e set do nome do apostador
   public String getName() {
@@ -67,46 +63,36 @@ public class Gambler {
   }
 
   // Construtor
-  public Gambler(Horse horse) {
+  public Gambler(Horse horse, Server server) {
     Scanner sc = new Scanner(System.in);
     // Informando atributos do apostador
-    System.out.print("Nome do jogador: ");
-    setName(sc.nextLine());
-
-    System.out.print("Saldo: ");
-    setWallet(sc.nextFloat());
-
-    System.out.print("Valor da aposta: ");
-    setBet(sc.nextFloat());
-
-    setHorse(horse);
-    System.out.println("\nOlá, " + getName() + "! Você apostou R$" + getBet() + " no cavalo " + horse.getHorseName() + ".");
-  }
-
-  // Conexão Client-Server
-  
-  //Método para conectar-se ao servidor
-  public void connectToServer(){
-    client = new Client();
-  }
-
-  //Classe Client
-  private class Client {
-    private Socket socket;
-    private BufferedReader reader;
-    private PrintWriter writer;
-
-    public Client() {
-      System.out.println("----- Conexão de Cliente -----");
-      try {
-        socket = new Socket("localhost", 9090);
-
-        writer = new PrintWriter(socket.getOutputStream(), true);
-        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+    server.writer.println("\nNome do jogador: ");
+    server.writer.println("WAITFORANSWER");
+    try {
+      setName(server.reader.readLine());
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
+    server.writer.println("\nSaldo: ");
+    server.writer.println("WAITFORANSWER");
+    try {
+      setWallet(Float.parseFloat(server.reader.readLine()));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    server.writer.println("\nValor da aposta: ");
+    server.writer.println("WAITFORANSWER");
+    try {
+      setBet(Float.parseFloat(server.reader.readLine()));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+
+    setHorse(horse);
+    server.writer.println("\nOlá, " + getName() + "! Você apostou R$" + getBet() + " no cavalo " + horse.getHorseName() + ".");
   }
+
 }

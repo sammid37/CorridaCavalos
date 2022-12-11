@@ -18,4 +18,4 @@ Sendo assim, um cavalo possui as seguintes características:
 ### Client
 
 ## 🧑‍💻 Desenvolvedores
-Christopher Tavares, Mayra Daher, Victoria Grise, Samantha Medeiros e Yan Feitosa.
+Christopher Tavares, Mayra Daher, Victoria Grisi, Samantha Medeiros e Yan Feitosa.

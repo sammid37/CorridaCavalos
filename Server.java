@@ -2,78 +2,70 @@ import java.io.*;
 import java.net.*;
 
 public class Server {
-    public static String ip = "localhost";
-    public static int port = 9090;
+  private static String ip = "localhost";
+  private static int port = 9090;
 
-    private Socket socket;
-    private BufferedReader reader;
-    private PrintWriter writer;
+  public BufferedReader reader;
+  public PrintWriter writer;
 
-    private ServerSocket server;
+  public ServerSocket serverSocket;
 
-    public int numberPlayers;
-    public int numberPlayersMax;
-
-    public Server() throws IOException{
-        System.out.println("----- Servidor -----");
-        numberPlayers = 0;
-        numberPlayersMax = 7;
-        
-        try {
-            server = new ServerSocket(port);
-            System.out.println("Servidor aberto, aceitando clientes na porta " + server.getLocalPort());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+  public static void main(String[] args) { // Main - Cria o servidor
+    try {
+      Server server = new Server();
+      server.listener(server);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    public static void main(String[] args) {
-        System.out.println("oi");
-        try {
-            Server server = new Server();
-            server.listenAndRegister();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+  public Server() throws IOException{ // Método construtor do servidor
+    System.out.println("---------------------------------");
+    System.out.println("<< CRIANDO SERVIDOR >>");
+
+    try {
+      serverSocket = new ServerSocket(port);
+        System.out.println("<< SERVIDOR ABERTO E ACEITANDO CLIENTES NA PORTA " + serverSocket.getLocalPort() + " >>");
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+  }
     
-    public void listenAndRegister() throws IOException{
-        Socket socket = null;
-        try {
-            socket = server.accept();
-            System.out.println("Cliente aceito na porta " + socket.getLocalPort());
+  public void listener(Server server) throws IOException{ // listener() aceita o cliente, abre as streams de read/write e executa o jogo (Race)
+    Socket socket = null;
 
-            numberPlayers++;
+    try {
+        socket = serverSocket.accept(); // aceita o cliente
+        System.out.println("<< CLIENTE ACEITO NA PORTA " + socket.getLocalPort() + " >>");
 
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer = new PrintWriter(socket.getOutputStream(), true);
+        this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); //criando stream de output para comunicar-se com o cliente
+        this.writer = new PrintWriter(socket.getOutputStream(), true); //criando stream de input para comunicar-se com o cliente
 
-            writer.write("------ Registrando Apostador n° " + numberPlayers + "------");
-            //new Gambler();
+        writer.println("\n\n");
 
-            while(numberPlayers < numberPlayersMax){
-                writer.write("Registrar mais um apostador?");
-                writer.write("1 - Sim");
-                writer.write("2 - Não");
-
-                String message = reader.readLine();
-
-                if("2".equals(message) && numberPlayers < 2){
-                    writer.write("Não atingiu a quantidade mínima de apostadores (2), tente novamente");
-                    continue;
-                }
-                else if("1".equals(message)){
-                    writer.write("------ Registrando Apostador n° " + numberPlayers + "------");
-                    //new Gambler();
-                    numberPlayers++;
-                }
-                else{
-                    writer.write(numberPlayers + " apostadores registrados!");
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        try { 
+          Race race = new Race(server); // cria objeto da corrida e inicia o menu
+          race.menu();
+        } catch (Exception e) {
+          e.printStackTrace();
+        } finally {
+          server.close(); // fecha o servidor
         }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+  }
+
+  public void close(){
+    try{
+      System.out.println("<< FECHANDO SERVIDOR >>");
+      System.out.println("---------------------------------");
+      serverSocket.close();
+      reader.close();
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+          
+  }
 }

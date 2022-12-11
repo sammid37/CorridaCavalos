@@ -9,6 +9,7 @@ public class Horse implements Runnable {
   private static int place = 1; // contador para identificar a colocação do cavalo
   private int bets_num;
   private float total_bet_value;
+  private Server server;
 
   static CyclicBarrier gate = null; // Permite que as threads iniciem "juntas" com o mesmo tempo possível
 
@@ -44,16 +45,20 @@ public class Horse implements Runnable {
     this.id = id;
   }
 
-  Horse(int idHorse, String nameHorse) {
+  Horse(int idHorse, String nameHorse, Server server) {
     setHorseId(idHorse);
     setHorseName(nameHorse);
+    this.server = server;
   }
 
-  static void threadMessage(String message) {
+  static void threadMessage(String message, Server server) {
     String threadName = Thread.currentThread().getName();
+    String format = "%s: %s%n";
     System.out.format("%s: %s%n",
         threadName,
         message);
+    server.writer.format(format, threadName, message);
+    
   }
 
   public void run() {
@@ -65,14 +70,14 @@ public class Horse implements Runnable {
         distanceTravelled += this.gallop();
 
         if (distanceTravelled < 100) {
-          threadMessage("🐎" + name + " percorreu " + distanceTravelled + " m.");
+          threadMessage("🐎" + name + " percorreu " + distanceTravelled + " m.", server);
         } else {
-          threadMessage("🏆" + name + " cruzou a linha de chegada em " + place + "º lugar");
+          threadMessage("🏆" + name + " cruzou a linha de chegada em " + place + "º lugar", server);
           place++;
         }
       }
     } catch (InterruptedException e) {
-      threadMessage("I wasn't done!");
+      threadMessage("I wasn't done!", server);
     } catch (BrokenBarrierException e) {
       e.printStackTrace();
     }
